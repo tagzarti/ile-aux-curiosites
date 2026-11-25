@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!--
+  L'Île aux Mille Curiosités — page principale.
+  Tout le jeu vit dans #scene (une scène = l'accueil, le hub ou une zone).
+  Lilo (#lilo) et le bouton maison (#maison) flottent par-dessus.
+-->
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#7cc4d6">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>L'Île aux Mille Curiosités</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="img/icone.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main id="scene" aria-live="off"></main>
+
+  <!-- Voile de couleur pour le cycle jour → crépuscule (ne bloque pas les touchers) -->
+  <div id="lumiere" aria-hidden="true"></div>
+
+  <!-- Bouton « retour à l'île » : une maison, en haut à gauche -->
+  <button id="maison" class="cache" aria-label="Retour à l'île">
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="46" fill="#fff8ec" stroke="#e7c98f" stroke-width="4"/>
+      <path d="M24 52 L50 28 L76 52" fill="none" stroke="#d98b6a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="32" y="50" width="36" height="26" rx="5" fill="#f2b08f"/>
+      <rect x="45" y="58" width="11" height="18" rx="4" fill="#9a6a52"/>
+    </svg>
+  </button>
+
+  <!-- Lilo, la luciole compagne (le dessin est injecté par js/moteur/lilo.js) -->
+  <button id="lilo" class="cache" aria-label="Lilo"></button>
+
+  <!-- Si la tablette est tenue en portrait : une petite animation « tourne-moi » -->
+  <div id="tourner" aria-hidden="true">
+    <svg viewBox="0 0 200 200">
+      <g class="tablette-tourne">
+        <rect x="70" y="40" width="60" height="100" rx="10" fill="#fff8ec" stroke="#d98b6a" stroke-width="6"/>
+        <circle cx="100" cy="128" r="5" fill="#d98b6a"/>
+      </g>
+      <path d="M150 150 A70 70 0 0 1 60 165" fill="none" stroke="#b5dca0" stroke-width="8" stroke-linecap="round"/>
+      <path d="M60 165 l12 -14 M60 165 l17 6" stroke="#b5dca0" stroke-width="8" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

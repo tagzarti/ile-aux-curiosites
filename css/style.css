@@ -1,0 +1,328 @@
+/* ==========================================================================
+   L'Île aux Mille Curiosités — styles
+   Couleurs douces, formes rondes, animations lentes (aucun flash).
+   ========================================================================== */
+
+:root {
+  --mer: #7cc4d6;
+  --mer-clair: #a8dde8;
+  --sable: #f4e3b5;
+  --herbe: #b5dca0;
+  --herbe-fonce: #8fc47e;
+  --creme: #fff8ec;
+  --peche: #f2b08f;
+  --rose: #f4b6c2;
+  --lavande: #c9b6e4;
+  --jaune: #ffe08a;
+  --menthe: #a6e3c8;
+  --brun: #9a6a52;
+  --fondu: 450ms;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--mer);
+  /* Pas de sélection, pas de menu au toucher long, pas de « tirer pour rafraîchir » */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  touch-action: none;
+  font-family: system-ui, sans-serif;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  transition: opacity var(--fondu) ease;
+}
+#scene.fondu { opacity: 0; }
+
+/* Les dessins de scène remplissent tout l'écran */
+#scene > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Les éléments touchables d'une scène */
+.touchable { cursor: pointer; }
+
+/* Groupes SVG animés autour de leur propre centre */
+.anime {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.anime-bas {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+/* ---------- Boutons flottants ---------- */
+#maison, #lilo {
+  position: fixed;
+  border: none;
+  background: none;
+  padding: 0;
+  z-index: 10;
+  touch-action: none;
+  transition: opacity 400ms ease, transform 400ms ease;
+}
+#maison {
+  top: max(14px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  width: 110px;
+  height: 110px;
+}
+#maison svg { width: 100%; height: 100%; filter: drop-shadow(0 4px 6px rgba(0,0,0,.15)); }
+#maison:active { transform: scale(.92); }
+
+#lilo {
+  left: max(10px, env(safe-area-inset-left));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  width: 150px;
+  height: 150px;
+}
+#lilo svg { width: 100%; height: 100%; overflow: visible; }
+
+.cache { opacity: 0; pointer-events: none; transform: scale(.8); }
+
+/* ---------- Lilo ---------- */
+.lilo-corps { animation: flotter 3.2s ease-in-out infinite; }
+.lilo-aile { animation: battre .35s ease-in-out infinite alternate; }
+.lilo-aile.droite { animation-delay: .17s; }
+.lilo-halo { animation: respirer 3.2s ease-in-out infinite; }
+.parle .lilo-halo { animation: briller .55s ease-in-out infinite alternate; }
+.parle .lilo-bouche { animation: parler .22s ease-in-out infinite alternate; }
+.lilo-yeux-fermes { display: none; }
+.dort .lilo-yeux-ouverts { display: none; }
+.dort .lilo-yeux-fermes { display: inline; }
+.dort .lilo-aile { animation-duration: 2.4s; }
+.dort .lilo-corps { animation-duration: 5s; }
+.lilo-saut { animation: sauter .5s ease-out; }
+
+@keyframes flotter {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes battre {
+  from { transform: rotate(-14deg) scaleY(1); }
+  to   { transform: rotate(10deg) scaleY(.8); }
+}
+@keyframes respirer {
+  0%, 100% { opacity: .45; transform: scale(1); }
+  50% { opacity: .7; transform: scale(1.08); }
+}
+@keyframes briller {
+  from { opacity: .6; transform: scale(1.05); }
+  to   { opacity: .95; transform: scale(1.22); }
+}
+@keyframes parler {
+  from { transform: scaleY(.5); }
+  to   { transform: scaleY(1.3); }
+}
+@keyframes sauter {
+  0% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-14px) scale(1.06); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* ---------- Animations de décor (lentes) ---------- */
+.balancer { animation: balancer 5s ease-in-out infinite; }
+.balancer.lent { animation-duration: 7s; }
+.flotte { animation: flotter 4s ease-in-out infinite; }
+.cligne { animation: cligner 5s infinite; }
+.derive { animation: deriver 60s linear infinite; }
+.derive.lente { animation-duration: 90s; }
+.vague { animation: vaguer 6s ease-in-out infinite; }
+.vague.b { animation-delay: -3s; }
+.luciole-deco { animation: voleter 9s ease-in-out infinite; }
+.zzz { animation: zzz 3.5s ease-in-out infinite; }
+
+@keyframes balancer {
+  0%, 100% { transform: rotate(-1.6deg); }
+  50% { transform: rotate(1.6deg); }
+}
+@keyframes cligner {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(.1); }
+}
+@keyframes deriver {
+  from { transform: translateX(-300px); }
+  to   { transform: translateX(1900px); }
+}
+@keyframes vaguer {
+  0%, 100% { transform: translateX(0); opacity: .5; }
+  50% { transform: translateX(30px); opacity: .9; }
+}
+@keyframes voleter {
+  0%, 100% { transform: translate(0, 0); opacity: .3; }
+  25% { transform: translate(40px, -30px); opacity: .9; }
+  50% { transform: translate(80px, 10px); opacity: .5; }
+  75% { transform: translate(30px, 30px); opacity: .9; }
+}
+@keyframes zzz {
+  0% { transform: translate(0, 0); opacity: 0; }
+  30% { opacity: .8; }
+  100% { transform: translate(18px, -40px); opacity: 0; }
+}
+
+/* Danse des amis du jardin pendant qu'ils rejouent la chanson */
+.danse { animation: danser .5s ease-in-out infinite alternate; }
+.danse.b { animation-delay: .25s; }
+@keyframes danser {
+  from { transform: translateY(0) rotate(-6deg); }
+  to   { transform: translateY(-22px) rotate(6deg); }
+}
+
+/* Le coquillage qui écoute */
+.ecoute { animation: ecouter 1s ease-in-out infinite alternate; }
+@keyframes ecouter {
+  from { transform: scale(1); }
+  to   { transform: scale(1.1); }
+}
+
+/* ---------- Écran « tourne la tablette » ---------- */
+#tourner {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--mer);
+  align-items: center;
+  justify-content: center;
+}
+#tourner svg { width: 50vmin; height: 50vmin; }
+.tablette-tourne {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tourner 2.5s ease-in-out infinite;
+}
+@keyframes tourner {
+  0%, 30% { transform: rotate(0); }
+  60%, 100% { transform: rotate(-90deg); }
+}
+/* Seulement sur les écrans tactiles tenus en portrait (pas sur ordinateur) */
+@media (orientation: portrait) and (pointer: coarse) {
+  #tourner { display: flex; }
+}
+
+/* Respecte le réglage « réduire les animations » de l'appareil */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ==========================================================================
+   Cycle jour / crépuscule
+   ========================================================================== */
+#lumiere {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background-color: rgba(255, 170, 90, 0);
+  transition: background-color 20s linear;
+  mix-blend-mode: multiply;
+}
+
+/* ==========================================================================
+   Espace parent (réservé aux adultes : ici, du texte est normal)
+   ========================================================================== */
+#parent-bouton {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  width: 72px;
+  height: 72px;
+  border: none;
+  background: none;
+  padding: 0;
+  z-index: 20;
+  opacity: .55;
+  touch-action: none;
+}
+#parent-bouton svg { width: 100%; height: 100%; }
+
+#parent {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(40, 50, 70, .55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: pan-y;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #3d3330;
+  user-select: text;
+  -webkit-user-select: text;
+}
+#parent.cache-parent { display: none; }
+.parent-carte {
+  background: var(--creme);
+  border-radius: 28px;
+  padding: 24px 32px;
+  width: min(820px, 94vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  touch-action: pan-y;
+  box-shadow: 0 10px 40px rgba(0,0,0,.25);
+  font-size: 18px;
+}
+.parent-carte header { display: flex; justify-content: space-between; align-items: center; }
+.parent-carte h2 { margin: 0 0 8px; font-size: 26px; }
+.parent-carte h3 { margin: 0 0 8px; font-size: 20px; color: #9a6a52; }
+.parent-carte h4 { margin: 12px 0 4px; }
+.parent-carte h4::first-letter { text-transform: uppercase; }
+.parent-carte section { border-top: 2px solid #f0e2cc; padding: 14px 0; }
+.parent-carte ul { margin: 4px 0; padding-left: 22px; }
+.parent-carte li { margin: 3px 0; }
+.parent-carte .aide { color: #8a7b70; margin-top: 0; }
+.parent-carte button, .parent-carte select {
+  font: inherit;
+  border-radius: 14px;
+  border: 2px solid #e7c98f;
+  background: #fff;
+  padding: 10px 16px;
+  margin: 4px 6px 4px 0;
+  color: inherit;
+  cursor: pointer;
+}
+.parent-carte .actif { background: #f2b08f; border-color: #d98b6a; color: #fff; }
+.parent-carte .danger { border-color: #e9a99a; color: #b4553f; }
+.parent-carte label { display: block; margin: 8px 0; }
+.parent-carte input[type=range] { width: 260px; vertical-align: middle; margin-left: 10px; }
+.calcul { width: min(440px, 94vw); text-align: center; }
+.calcul .saisie {
+  font-size: 40px; font-weight: bold; height: 60px; line-height: 60px;
+  border-radius: 14px; background: #fff; margin: 10px auto; width: 160px;
+  transition: background .2s;
+}
+.calcul .saisie.faux { background: #f8d6cf; }
+.clavier { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
+.clavier button { font-size: 26px; padding: 14px 0; margin: 0; }
+.clavier .ok { background: #b5dca0; border-color: #8fc47e; }
+
+/* Police Andika (SIL, licence OFL) : conçue pour les enfants qui apprennent à lire */
+@font-face {
+  font-family: 'Andika';
+  src: url('../polices/Andika-Bold.ttf') format('truetype');
+  font-weight: normal;
+  font-display: block;
+}
+
+/* Pluie douce sur l'île (météo) */
+.pluie-douce { animation: pleuvoir 1.6s linear infinite; }
+@keyframes pleuvoir {
+  from { transform: translate(0, -60px); }
+  to   { transform: translate(-20px, 60px); }
+}
