@@ -46,16 +46,32 @@ Pour arrêter le jeu, appuie sur **Ctrl + C** dans le Terminal.
 2. Tape cette adresse dans **Chrome** sur la tablette.
 3. Tiens la tablette **en paysage** et touche Lilo pour la réveiller.
 
-> Dans ce mode de test, le jeu ne s'installe pas sur l'écran d'accueil et ne marche pas hors-ligne.
-> C'est normal : il faut une adresse sécurisée (https). L'étape 3 règle ça.
+> Ce mode de test sert pendant le développement : pas d'installation ni de hors-ligne (voir l'étape 3).
 
 **Si Mac demande d'autoriser « python3 » à recevoir des connexions**, réponds « Autoriser ».
 
-## 3. Installer le jeu pour de vrai (icône + hors-ligne) — étape à venir
+## 3. Installer le jeu sur la tablette (icône + hors-ligne)
 
-Le jeu sera publié sur **GitHub Pages** (gratuit, https). Ensuite, sur la tablette :
-Chrome → menu **⋮** → **Ajouter à l'écran d'accueil** → **Installer**.
-Une fois ouvert une fois, il marche **sans Internet**.
+Le jeu est en ligne ici : **https://tagzarti.github.io/ile-aux-curiosites/**
+
+Sur la tablette Android, dans **Chrome** :
+1. Ouvre l'adresse ci-dessus (avec Internet, une seule fois).
+2. Menu **⋮** → **Installer l'application** (ou « Ajouter à l'écran d'accueil »).
+3. Lance le jeu depuis sa nouvelle icône 🏝️, attends quelques secondes : tout est enregistré.
+4. Ensuite, il marche **sans Internet** (vérifie en mode avion).
+
+### Publier une nouvelle version
+Après une modification du jeu sur le Mac :
+1. Dans `sw.js`, augmente le numéro : `ile-v4` → `ile-v5`.
+2. Dans le Terminal :
+   ```bash
+   cd ~/Projects/ile-aux-curiosites
+   git add -A
+   git commit -m "Nouvelle version"
+   git push
+   ```
+3. Une à deux minutes plus tard, la tablette récupère la nouvelle version
+   la prochaine fois qu'elle ouvre le jeu avec Internet (il faut parfois l'ouvrir deux fois).
 
 ## 4. La voix de Lilo
 
