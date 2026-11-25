@@ -6,7 +6,7 @@
    (sinon la tablette garde l'ancienne copie).
    ========================================================================== */
 
-const VERSION = 'ile-v4';
+const VERSION = 'ile-v5';
 
 const FICHIERS = [
   './',

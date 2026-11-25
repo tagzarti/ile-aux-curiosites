@@ -10,33 +10,37 @@
 import { VOYELLES, CONSONNES, EXEMPLES, MOTS, PHRASES, HISTOIRES,
          idSon, idSyllabe, idMot, idPhrase, decouper } from './lecture.js';
 
-const PHONEMES = {
-  a: 'aː', i: 'iː', o: 'oː', u: 'yː', é: 'eː', e: 'əː',
-  m: 'mːːː', l: 'lːːː', r: 'ʁːːː', s: 'sːːː', f: 'fːːː', v: 'vːːː', n: 'nːːː',
-  p: 'pə', t: 'tə', d: 'də', b: 'bə',
-};
-const PHONEME_SIMPLE = { a: 'a', i: 'i', o: 'o', u: 'y', é: 'e', e: 'ə', m: 'm', l: 'l', r: 'ʁ', s: 's', f: 'f',
+/* Comment on fait entendre chaque lettre (en phonèmes, avec l'accent tonique « ˈ »).
+   Voyelles : leur son pur. Consonnes : leur son suivi d'un petit « e » très léger
+   (« mə », « sə »), comme on l'apprend en maternelle — jamais le nom de la lettre (« èm »). */
+const PHONEME = { a: 'a', i: 'i', o: 'o', u: 'y', é: 'e', e: 'ə', m: 'm', l: 'l', r: 'ʁ', s: 's', f: 'f',
   v: 'v', n: 'n', p: 'p', t: 't', d: 'd', b: 'b' };
-const LECTURE_TABLETTE = { m: 'mmm', l: 'lll', r: 'rrr', s: 'sss', f: 'fff', v: 'vvv', n: 'nnn', p: 'pe', t: 'te',
-  d: 'de', b: 'be', a: 'a', i: 'i', o: 'o', u: 'u', é: 'é', e: 'e' };
+const VOYELLES_SET = new Set(['a', 'i', 'o', 'u', 'é', 'e']);
+const sonLettre = (l) => (VOYELLES_SET.has(l) ? `ˈ${PHONEME[l]}` : `ˈ${PHONEME[l]}ə`);
+const LECTURE_TABLETTE = { m: 'meu', l: 'leu', r: 'reu', s: 'seu', f: 'feu', v: 'veu', n: 'neu', p: 'peu', t: 'teu',
+  d: 'deu', b: 'beu', a: 'a', i: 'i', o: 'o', u: 'u', é: 'é', e: 'eu' };
+
+/* Mots que la voix lisait mal : on lui donne la bonne prononciation. */
+const PRONONCIATIONS = { igloo: 'iɡlˈu', rigolent: 'ʁiɡˈɔl', usine: 'yzˈin' };
+const corriger = (texte) => texte.replace(/[a-zàâéèêëîïôûùç]+/gi, (m) => (PRONONCIATIONS[m.toLowerCase()] ? `[[ ${PRONONCIATIONS[m.toLowerCase()]} ]]` : m));
 
 export const REPLIQUES_LECTURE = {};
 const r = REPLIQUES_LECTURE;
 
-for (const l of [...VOYELLES, ...CONSONNES]) r[idSon(l)] = `[[ ${PHONEMES[l]} ]]|${LECTURE_TABLETTE[l]}`;
+for (const l of [...VOYELLES, ...CONSONNES]) r[idSon(l)] = `[[ ${sonLettre(l)} ]]|${LECTURE_TABLETTE[l]}`;
 
 for (const c of CONSONNES) {
   for (const v of VOYELLES) {
     const s = c + v;
-    // Les syllabes en « e » (me, le, te…) passent par les phonèmes, sinon la voix les déforme
-    r[idSyllabe(s)] = v === 'e' ? `[[ ${PHONEME_SIMPLE[c]}ə ]]|${s}` : s;
+    // Toujours en phonèmes : sinon la voix lit parfois le nom des lettres (« bé » → « bi »)
+    r[idSyllabe(s)] = `[[ ˈ${PHONEME[c]}${PHONEME[v]} ]]|${s}`;
   }
 }
 
-const mots = new Set(['lilo', ...Object.values(EXEMPLES), ...MOTS.map((m) => m.mot)]);
+const mots = new Set(['lilo', ...Object.values(EXEMPLES).filter(Boolean), ...MOTS.map((m) => m.mot)]);
 const textes = [...PHRASES.map((p) => p.texte), ...HISTOIRES.flatMap((h) => h.pages.map((p) => p.texte))];
 textes.forEach((t) => decouper(t).forEach(({ mot }) => mots.add(mot.toLowerCase())));
-for (const m of mots) r[idMot(m)] = m === 'lilo' ? 'Lilo' : m;
+for (const m of mots) r[idMot(m)] = m === 'lilo' ? 'Lilo' : (PRONONCIATIONS[m] ? `${corriger(m)}|${m}` : m);
 
-for (const t of textes) r[idPhrase(t)] = t;
+for (const t of textes) r[idPhrase(t)] = corriger(t) === t ? t : `${corriger(t)}|${t}`;
 for (const h of HISTOIRES) r[`titre_${h.id}`] = h.titre;

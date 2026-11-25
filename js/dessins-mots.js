@@ -113,6 +113,13 @@ export const DESSINS_MOTS = {
     <path d="M0 -70 Q-40 10 0 90 M0 -70 Q40 10 0 90 M-55 -45 Q-80 10 -55 68 M55 -45 Q80 10 55 68" fill="none" stroke="#a6cf80" stroke-width="7"/>
     <path d="M0 -70 q4 -14 -2 -22" fill="none" stroke="#8a6a50" stroke-width="6" stroke-linecap="round"/>`,
 
+  usine: () => `
+    <path d="M-90 80 V-10 L-50 -40 V-10 L-10 -40 V-10 L30 -40 V-10 L90 -10 V80 Z" fill="#c9b6e4" stroke="#a88fcf" stroke-width="6" stroke-linejoin="round"/>
+    <rect x="55" y="-90" width="26" height="80" rx="6" fill="#a88fcf"/>
+    <circle class="flotte" cx="72" cy="-108" r="16" fill="#eef2f6"/><circle class="flotte" cx="92" cy="-124" r="11" fill="#eef2f6"/>
+    <rect x="-70" y="10" width="28" height="26" rx="6" fill="#fff3c9"/><rect x="-25" y="10" width="28" height="26" rx="6" fill="#fff3c9"/>
+    <rect x="20" y="10" width="28" height="26" rx="6" fill="#fff3c9"/><rect x="-14" y="46" width="28" height="34" rx="6" fill="#8a6a50"/>`,
+
   nid: () => `
     <ellipse cx="0" cy="20" rx="90" ry="50" fill="#c9a37a"/>
     <ellipse cx="0" cy="5" rx="70" ry="28" fill="#8a6a50"/>

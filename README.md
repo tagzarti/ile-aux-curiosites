@@ -62,7 +62,7 @@ Sur la tablette Android, dans **Chrome** :
 
 ### Publier une nouvelle version
 Après une modification du jeu sur le Mac :
-1. Dans `sw.js`, augmente le numéro : `ile-v4` → `ile-v5`.
+1. Dans `sw.js`, augmente le numéro : `ile-v5` → `ile-v6`.
 2. Dans le Terminal :
    ```bash
    cd ~/Projects/ile-aux-curiosites

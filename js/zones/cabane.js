@@ -196,13 +196,25 @@ export default {
           etincelles(svg, x, y, VOYELLES.includes(l) ? '#f4b6c2' : '#a8c8f0', 5);
           await voix.dire(idSon(l));
           if (j !== jeton || !actif) return;
-          // Puis un mot exemple, avec son dessin
+          // Puis un mot exemple qui commence par ce son, avec son dessin
           exemple.innerHTML = '';
           const mot = EXEMPLES[l];
-          const des = dessin(exemple, mot, 690, 735, 0.48);
-          ecrire(exemple, mot, 940, 740, 80);
-          rebond(des, 1.1);
-          await voix.dire(idMot(mot));
+          if (mot) {
+            const des = dessin(exemple, mot, 640, 735, 0.48);
+            const t = ecrire(exemple, mot, 760, 740, 86, { couleurs: false, couleur: '#9a8f88' });
+            t.setAttribute('text-anchor', 'start');
+            // La première lettre (celle qu'on vient d'entendre) en couleur et plus grande
+            const premiere = t.firstChild;
+            premiere.setAttribute('fill', VOYELLES.includes(l) ? COULEURS.voyelle : COULEURS.consonne);
+            premiere.setAttribute('font-size', 120);
+            rebond(des, 1.1);
+            await voix.dire(idMot(mot));
+          } else {
+            // Le « e » n'a pas de mot exemple : il rechante juste son son
+            rebond(b.anime, 1.2);
+            await attendre(250);
+            if (j === jeton) await voix.dire(idSon(l));
+          }
           if (j === jeton) reussite(1, l, `son « ${l} »`);
         });
       });

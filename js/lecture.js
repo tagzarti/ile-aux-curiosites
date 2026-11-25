@@ -18,9 +18,10 @@
 export const VOYELLES = ['a', 'i', 'o', 'u', 'é', 'e'];
 export const CONSONNES = ['m', 'l', 'r', 's', 'f', 'v', 'n', 'p', 't', 'd', 'b'];
 
-/** Un exemple (avec dessin) pour chaque lettre. */
+/** Un mot exemple (avec dessin) qui COMMENCE par le son de la lettre.
+    Le « e » (son « eu » comme dans « le ») n'a pas d'exemple : aucun mot courant ne commence par ce son. */
 export const EXEMPLES = {
-  a: 'abeille', i: 'igloo', o: 'orange', u: 'lune', é: 'étoile', e: 'melon',
+  a: 'abeille', i: 'igloo', o: 'orange', u: 'usine', é: 'étoile', e: null,
   m: 'moto', l: 'lune', r: 'rat', s: 'salade', f: 'fusée', v: 'vélo',
   n: 'nid', p: 'pomme', t: 'tomate', d: 'domino', b: 'banane',
 };
