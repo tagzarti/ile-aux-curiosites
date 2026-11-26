@@ -105,8 +105,14 @@ class Gestionnaire(SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    serveur = ThreadingHTTPServer(("127.0.0.1", PORT), partial(Gestionnaire, directory=str(RACINE)))
     adresse = f"http://localhost:{PORT}/outils/enregistreur.html"
+    try:
+        serveur = ThreadingHTTPServer(("127.0.0.1", PORT), partial(Gestionnaire, directory=str(RACINE)))
+    except OSError:
+        # Déjà lancé (dans un autre onglet du Terminal) : on rouvre simplement la page
+        print(f"\n  L'enregistreur tourne déjà. J'ouvre la page : {adresse}\n")
+        webbrowser.open(adresse)
+        sys.exit(0)
     print(f"\n  🎙️  Enregistreur de voix prêt : {adresse}")
     print("  Pour arrêter : Ctrl + C\n")
     if "--sans-navigateur" not in sys.argv:
