@@ -75,9 +75,10 @@ def main():
     nouveaux = 0
 
     for ident, texte in repliques.items():
-        perso = DOSSIER_VOIX / f"{ident}.mp3"
-        if perso.exists():  # ton enregistrement passe en priorité
-            fichiers[ident] = f"{ident}.mp3"
+        perso = next((DOSSIER_VOIX / f"{ident}{ext}" for ext in (".m4a", ".mp3", ".wav")
+                      if (DOSSIER_VOIX / f"{ident}{ext}").exists()), None)
+        if perso:  # ton enregistrement passe en priorité
+            fichiers[ident] = perso.name
             continue
         cible = DOSSIER_LILO / f"{ident}.m4a"
         e = empreinte(texte)
@@ -95,7 +96,7 @@ def main():
 
     INDEX.write_text(json.dumps({"fichiers": fichiers, "empreintes": empreintes},
                                 ensure_ascii=False, indent=1), encoding="utf-8")
-    perso = sum(1 for v in fichiers.values() if v.endswith(".mp3"))
+    perso = sum(1 for v in fichiers.values() if not v.startswith("lilo/"))
     print(f"\n✅ {len(fichiers)} phrases prêtes ({nouveaux} générées, {perso} avec ta voix).")
 
 

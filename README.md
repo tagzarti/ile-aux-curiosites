@@ -94,11 +94,30 @@ Tout est dans `js/lecture.js` (mots découpés en syllabes, phrases, histoires p
 Après modification, lance `./outils/generer-voix.sh` : les voix des nouveaux mots sont créées.
 Un nouveau mot a besoin d'un dessin dans `js/dessins-mots.js` (sinon un rond s'affiche).
 
-### Mettre TA voix à la place de Siwis
+### Enregistrer les sons des lettres et les syllabes (une seule fois)
+
+Les voix de synthèse prononcent mal les sons isolés (« mmm », « ma »). Pour la Cabane aux Mots,
+les **17 sons de lettres** et les **66 syllabes** s'enregistrent donc avec **ta voix**, une fois pour toutes.
+Les mots, phrases et histoires, eux, restent lus par Siwis.
+
+```bash
+cd ~/Projects/ile-aux-curiosites
+./outils/enregistrer-voix.sh
+```
+
+Une page s'ouvre : choisis un son, **maintiens** le bouton rouge (ou la barre espace) en parlant,
+écoute, puis « Garder ». Les silences sont coupés et le volume égalisé automatiquement.
+Tu peux faire une partie seulement et revenir plus tard. Ensuite, publie la nouvelle version (étape 3).
+
+> ⚠️ Le dépôt GitHub est public : tes enregistrements y seront visibles (ce sont seulement des sons
+> comme « ma » ou « sss »).
+
+### Mettre TA voix à la place de Siwis (pour n'importe quelle phrase)
 1. Ouvre `js/repliques.js` : chaque phrase a un **identifiant** (ex. `hub_bienvenue`).
 2. Enregistre la phrase et exporte-la en **.mp3** au nom exact de l'identifiant : `hub_bienvenue.mp3`.
 3. Dépose-la dans **`voix/`** (pas dans `voix/lilo/`).
 4. Lance `./outils/generer-voix.sh` : ton enregistrement passe devant Siwis.
+   (Formats acceptés : .mp3, .m4a ou .wav.)
 
 Tu peux n'en enregistrer que quelques-unes : les autres restent en Siwis.
 

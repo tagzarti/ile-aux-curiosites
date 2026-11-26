@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<!--
+  Enregistreur de voix — pour le parent (sur le Mac).
+  Enregistre les sons des lettres et les syllabes de la Cabane aux Mots.
+  Lancer avec : ./outils/enregistrer-voix.sh
+-->
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enregistreur de voix — Île aux Mille Curiosités</title>
+  <style>
+    @font-face { font-family: 'Andika'; src: url('../polices/Andika-Bold.ttf'); }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: #fff8ec; color: #3d3330; }
+    header { padding: 16px 28px; background: #f6dfbd; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    header h1 { margin: 0; font-size: 22px; }
+    .progres { font-size: 18px; }
+    .barre { width: 220px; height: 12px; border-radius: 6px; background: #fff; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 8px; }
+    .barre div { height: 100%; background: #8fc47e; transition: width .3s; }
+    main { display: grid; grid-template-columns: 1fr 420px; gap: 24px; padding: 24px 28px; }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+    h2 { font-size: 18px; margin: 18px 0 10px; color: #9a6a52; }
+    .grille { display: flex; flex-wrap: wrap; gap: 8px; }
+    .carte {
+      font-family: Andika, sans-serif; font-size: 30px; min-width: 70px; height: 64px; padding: 0 10px;
+      border-radius: 16px; border: 3px solid #e7c98f; background: #fff; cursor: pointer; position: relative; color: inherit;
+    }
+    .carte.fait { background: #e9f6df; border-color: #8fc47e; }
+    .carte.fait::after { content: '✓'; position: absolute; top: 2px; right: 6px; font: bold 13px system-ui; color: #5f9e4f; }
+    .carte.choisie { outline: 4px solid #f2b35a; outline-offset: 2px; }
+    .studio {
+      position: sticky; top: 16px; align-self: start; background: #fff; border-radius: 28px;
+      padding: 24px; box-shadow: 0 6px 24px rgba(0,0,0,.08); text-align: center;
+    }
+    .studio .son { font-family: Andika, sans-serif; font-size: 120px; line-height: 1.1; color: #4f7cc0; }
+    .studio .conseil { font-size: 18px; min-height: 52px; color: #6d625b; margin: 6px 0 16px; }
+    .micro {
+      width: 170px; height: 170px; border-radius: 50%; border: none; background: #f28b82; color: #fff;
+      font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 6px 0 #d46b62; touch-action: none; user-select: none;
+    }
+    .micro.actif { background: #e0607e; transform: translateY(4px); box-shadow: 0 2px 0 #b84a64; animation: pulse 1s infinite; }
+    @keyframes pulse { 50% { filter: brightness(1.15); } }
+    .niveau { height: 10px; background: #f0e2cc; border-radius: 5px; margin: 14px 0; overflow: hidden; }
+    .niveau div { height: 100%; width: 0; background: #8fc47e; transition: width .05s; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }
+    .actions button {
+      font: inherit; font-size: 16px; padding: 10px 14px; border-radius: 14px; border: 2px solid #e7c98f;
+      background: #fff; cursor: pointer; color: inherit;
+    }
+    .actions button:disabled { opacity: .4; cursor: default; }
+    .actions .garder { background: #b5dca0; border-color: #8fc47e; font-weight: bold; }
+    .etat { min-height: 24px; margin-top: 12px; font-size: 16px; color: #9a6a52; }
+    .aide { background: #fff3c9; border-radius: 16px; padding: 12px 18px; font-size: 15px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🎙️ Enregistreur de voix</h1>
+    <div class="progres"><span id="compte">0 / 0</span> enregistrés <span class="barre"><div id="barre"></div></span></div>
+  </header>
+  <main>
+    <div>
+      <div class="aide">
+        <strong>Comment faire :</strong> choisis un son, <strong>maintiens</strong> le gros bouton rouge (ou la barre
+        <kbd>espace</kbd>) pendant que tu parles, puis relâche. Tu entends le résultat : <strong>« Garder »</strong>
+        l'enregistre et passe au suivant. Parle près du micro, dans une pièce calme, avec ta voix habituelle.
+        Tu peux t'arrêter quand tu veux : ce qui n'est pas enregistré garde la voix Siwis.
+      </div>
+      <h2>Sons des lettres (dire le son, pas le nom de la lettre)</h2>
+      <div class="grille" id="sons"></div>
+      <h2>Syllabes</h2>
+      <div class="grille" id="syllabes"></div>
+    </div>
+
+    <div class="studio">
+      <div class="son" id="son">—</div>
+      <div class="conseil" id="conseil">Choisis un son à gauche.</div>
+      <button class="micro" id="micro" disabled>Maintenir<br>pour parler</button>
+      <div class="niveau"><div id="niveau"></div></div>
+      <div class="actions">
+        <button id="reecouter" disabled>▶ Réécouter</button>
+        <button id="garder" class="garder" disabled>✓ Garder</button>
+        <button id="actuel" disabled>🔈 Version actuelle</button>
+        <button id="effacer" disabled>✕ Effacer le mien</button>
+      </div>
+      <div class="etat" id="etat"></div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { VOYELLES, CONSONNES, idSon, idSyllabe } from '../js/lecture.js';
+
+    /* Conseils de prononciation pour les sons */
+    const CONSEILS = {
+      a: 'dire « a »', i: 'dire « i »', o: 'dire « o » (comme dans moto)', u: 'dire « u » (comme dans lune)',
+      é: 'dire « é »', e: 'dire « eu » (comme dans « le »)',
+      m: 'dire « mmmm » (bouche fermée), pas « èm »', l: 'dire « llll », pas « èl »', r: 'dire « rrrr »',
+      s: 'dire « ssss » (le serpent)', f: 'dire « ffff »', v: 'dire « vvvv »', n: 'dire « nnnn »',
+      p: 'dire « p » très court (« pe »)', t: 'dire « t » très court (« te »)',
+      d: 'dire « d » très court (« de »)', b: 'dire « b » très court (« be »)',
+    };
+
+    const elements = [
+      ...[...VOYELLES, ...CONSONNES].map((l) => ({ id: idSon(l), texte: l, conseil: CONSEILS[l], zone: 'sons' })),
+      ...CONSONNES.flatMap((c) => VOYELLES.map((v) => ({ id: idSyllabe(c + v), texte: c + v, conseil: `dire « ${c + v} », tout simplement`, zone: 'syllabes' }))),
+    ];
+
+    const $ = (id) => document.getElementById(id);
+    let perso = new Set();
+    let index = {};
+    let choisi = null;
+    let dernierWav = null;
+    let dernierUrl = null;
+
+    async function charger() {
+      perso = new Set((await (await fetch('/api/etat')).json()).perso);
+      index = (await (await fetch('../voix/index.json', { cache: 'no-store' })).json()).fichiers || {};
+      dessiner();
+    }
+
+    function dessiner() {
+      for (const zone of ['sons', 'syllabes']) $(zone).innerHTML = '';
+      for (const e of elements) {
+        const b = document.createElement('button');
+        b.className = 'carte' + (perso.has(e.id) ? ' fait' : '') + (choisi === e ? ' choisie' : '');
+        b.textContent = e.texte;
+        b.onclick = () => choisir(e);
+        $(e.zone).appendChild(b);
+      }
+      const n = elements.filter((e) => perso.has(e.id)).length;
+      $('compte').textContent = `${n} / ${elements.length}`;
+      $('barre').style.width = `${(100 * n) / elements.length}%`;
+    }
+
+    function choisir(e) {
+      choisi = e;
+      dernierWav = null;
+      $('son').textContent = e.texte;
+      $('son').style.color = VOYELLES.includes(e.texte) ? '#e0607e' : '#4f7cc0';
+      $('conseil').textContent = e.conseil;
+      $('micro').disabled = false;
+      $('reecouter').disabled = true;
+      $('garder').disabled = true;
+      $('actuel').disabled = !index[e.id];
+      $('effacer').disabled = !perso.has(e.id);
+      $('etat').textContent = perso.has(e.id) ? 'Déjà enregistré avec ta voix (tu peux le refaire).' : '';
+      dessiner();
+    }
+
+    /* ---------- Micro ---------- */
+    let flux = null, enregistreur = null, morceaux = [], analyse = null, ctx = null;
+
+    async function ouvrirMicro() {
+      if (flux) return;
+      flux = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: true, autoGainControl: true } });
+      ctx = new AudioContext();
+      analyse = ctx.createAnalyser();
+      analyse.fftSize = 1024;
+      ctx.createMediaStreamSource(flux).connect(analyse);
+      const buf = new Float32Array(analyse.fftSize);
+      (function vumetre() {
+        analyse.getFloatTimeDomainData(buf);
+        let max = 0; for (const v of buf) max = Math.max(max, Math.abs(v));
+        $('niveau').style.width = `${Math.min(100, max * 140)}%`;
+        requestAnimationFrame(vumetre);
+      })();
+    }
+
+    async function commencer() {
+      if (!choisi || enregistreur) return;
+      try { await ouvrirMicro(); } catch (e) { $('etat').textContent = '⚠️ Le micro est refusé : autorise-le dans le navigateur.'; return; }
+      morceaux = [];
+      enregistreur = new MediaRecorder(flux);
+      enregistreur.ondataavailable = (ev) => morceaux.push(ev.data);
+      enregistreur.onstop = traiter;
+      enregistreur.start();
+      $('micro').classList.add('actif');
+      $('etat').textContent = '🔴 Je t\'écoute…';
+    }
+
+    function arreter() {
+      if (!enregistreur) return;
+      // On laisse 150 ms de marge pour ne pas couper la fin du son
+      setTimeout(() => { enregistreur.stop(); enregistreur = null; }, 150);
+      $('micro').classList.remove('actif');
+    }
+
+    async function traiter() {
+      const blob = new Blob(morceaux);
+      const audio = await ctx.decodeAudioData(await blob.arrayBuffer());
+      const nettoye = nettoyer(audio.getChannelData(0), audio.sampleRate);
+      if (!nettoye) { $('etat').textContent = 'Je n\'ai rien entendu… Parle un peu plus fort, près du micro.'; return; }
+      dernierWav = encoderWav(nettoye, audio.sampleRate);
+      if (dernierUrl) URL.revokeObjectURL(dernierUrl);
+      dernierUrl = URL.createObjectURL(dernierWav);
+      new Audio(dernierUrl).play();
+      $('reecouter').disabled = false;
+      $('garder').disabled = false;
+      $('etat').textContent = 'Écoute… Si ça te plaît : « Garder ». Sinon, recommence.';
+    }
+
+    /** Coupe les silences au début et à la fin, égalise le volume, adoucit les bords. */
+    function nettoyer(d, sr) {
+      const fen = Math.round(sr * 0.01);
+      let crete = 0; for (const v of d) crete = Math.max(crete, Math.abs(v));
+      if (crete < 0.02) return null;
+      const seuil = Math.max(0.012, crete * 0.06);
+      const fort = (i) => { let m = 0; for (let k = i; k < Math.min(d.length, i + fen); k++) m = Math.max(m, Math.abs(d[k])); return m > seuil; };
+      let debut = 0; while (debut < d.length && !fort(debut)) debut += fen;
+      let fin = d.length - fen; while (fin > debut && !fort(fin)) fin -= fen;
+      debut = Math.max(0, debut - Math.round(sr * 0.06));
+      fin = Math.min(d.length, fin + fen + Math.round(sr * 0.12));
+      const sortie = d.slice(debut, fin);
+      const gain = 0.89 / crete;
+      const fondu = Math.round(sr * 0.012);
+      for (let i = 0; i < sortie.length; i++) {
+        let g = gain;
+        if (i < fondu) g *= i / fondu;
+        if (i > sortie.length - fondu) g *= (sortie.length - i) / fondu;
+        sortie[i] *= g;
+      }
+      return sortie;
+    }
+
+    function encoderWav(d, sr) {
+      const tampon = new ArrayBuffer(44 + d.length * 2);
+      const v = new DataView(tampon);
+      const ecrire = (o, s) => [...s].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+      ecrire(0, 'RIFF'); v.setUint32(4, 36 + d.length * 2, true); ecrire(8, 'WAVE');
+      ecrire(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+      v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+      ecrire(36, 'data'); v.setUint32(40, d.length * 2, true);
+      for (let i = 0; i < d.length; i++) v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, d[i])) * 0x7fff, true);
+      return new Blob([tampon], { type: 'audio/wav' });
+    }
+
+    /* ---------- Boutons ---------- */
+    const micro = $('micro');
+    micro.addEventListener('pointerdown', (e) => { e.preventDefault(); micro.setPointerCapture(e.pointerId); commencer(); });
+    micro.addEventListener('pointerup', arreter);
+    micro.addEventListener('pointercancel', arreter);
+    document.addEventListener('keydown', (e) => { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); commencer(); } });
+    document.addEventListener('keyup', (e) => { if (e.code === 'Space') { e.preventDefault(); arreter(); } });
+
+    $('reecouter').onclick = () => dernierUrl && new Audio(dernierUrl).play();
+    $('actuel').onclick = () => choisi && index[choisi.id] && new Audio(`../voix/${index[choisi.id]}?t=${Date.now()}`).play();
+
+    $('garder').onclick = async () => {
+      if (!dernierWav || !choisi) return;
+      $('garder').disabled = true;
+      const r = await fetch(`/api/enregistrer?id=${choisi.id}`, { method: 'POST', body: dernierWav });
+      if (!r.ok) { $('etat').textContent = '⚠️ Problème d\'enregistrement, réessaie.'; return; }
+      await charger();
+      // On passe au prochain son pas encore enregistré
+      const i = elements.indexOf(choisi);
+      const suivant = [...elements.slice(i + 1), ...elements.slice(0, i)].find((e) => !perso.has(e.id));
+      if (suivant) { choisir(suivant); $('etat').textContent = '✓ Gardé ! Au suivant.'; }
+      else { choisir(choisi); $('etat').textContent = '🎉 Tout est enregistré ! Pense à publier la nouvelle version.'; }
+    };
+
+    $('effacer').onclick = async () => {
+      if (!choisi || !confirm(`Effacer ton enregistrement de « ${choisi.texte} » ? (la voix Siwis reprend sa place)`)) return;
+      await fetch(`/api/effacer?id=${choisi.id}`, { method: 'POST' });
+      await charger();
+      choisir(choisi);
+    };
+
+    await charger();
+    choisir(elements.find((e) => !perso.has(e.id)) || elements[0]);
+  </script>
+</body>
+</html>
