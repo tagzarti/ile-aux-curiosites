@@ -62,7 +62,7 @@ Sur la tablette Android, dans **Chrome** :
 
 ### Publier une nouvelle version
 Après une modification du jeu sur le Mac :
-1. Dans `sw.js`, augmente le numéro : `ile-v5` → `ile-v6`.
+1. Dans `sw.js`, augmente le numéro : `ile-v6` → `ile-v7`.
 2. Dans le Terminal :
    ```bash
    cd ~/Projects/ile-aux-curiosites
@@ -75,9 +75,10 @@ Après une modification du jeu sur le Mac :
 
 ## 4. La voix de Lilo
 
-Lilo parle avec **Siwis**, une voix française libre et naturelle (licence CC-BY 4.0).
-Chaque phrase est un petit fichier audio rangé dans `voix/lilo/`. Elle fonctionne donc
-hors-ligne et sonne pareil sur toutes les tablettes.
+Lilo parle avec **Hélène**, une voix neuronale du service **Inworld**. Chaque phrase est
+fabriquée à l'avance sur le Mac et rangée dans `voix/lilo/` : le jeu reste donc hors-ligne
+et sonne pareil sur toutes les tablettes. La clé Inworld est dans `outils/inworld.env`
+(sur le Mac uniquement, jamais publiée). Sans clé, le générateur utilise la voix libre Siwis.
 
 **Après avoir ajouté ou modifié une phrase** dans `js/repliques.js`, lance :
 
@@ -94,11 +95,10 @@ Tout est dans `js/lecture.js` (mots découpés en syllabes, phrases, histoires p
 Après modification, lance `./outils/generer-voix.sh` : les voix des nouveaux mots sont créées.
 Un nouveau mot a besoin d'un dessin dans `js/dessins-mots.js` (sinon un rond s'affiche).
 
-### Enregistrer les sons des lettres et les syllabes (une seule fois)
+### (Facultatif) Enregistrer toi-même les sons des lettres et les syllabes
 
-Les voix de synthèse prononcent mal les sons isolés (« mmm », « ma »). Pour la Cabane aux Mots,
-les **17 sons de lettres** et les **66 syllabes** s'enregistrent donc avec **ta voix**, une fois pour toutes.
-Les mots, phrases et histoires, eux, restent lus par Siwis.
+Avec Hélène, les sons de lettres sont écrits comme on les dit (« mmmm », « ssss », « peu »).
+Si un son ne te plaît pas, tu peux le remplacer par ta voix avec l'enregistreur :
 
 ```bash
 cd ~/Projects/ile-aux-curiosites
@@ -161,7 +161,7 @@ Voir aussi **[CHECKLIST.md](CHECKLIST.md)** avant de faire jouer l'enfant.
 
 ## Crédits
 
-- **Voix de Lilo** : synthèse avec [Piper](https://github.com/OHF-Voice/piper1-gpl), voix `fr_FR-siwis-medium`,
-  entraînée sur la base SIWIS (Université d'Édimbourg / Idiap), licence **CC BY 4.0**.
+- **Voix de Lilo** : voix « Hélène » du service Inworld (inworld-tts-2), générée avec le compte du créateur du jeu.
+  Voix de secours : [Piper](https://github.com/OHF-Voice/piper1-gpl) `fr_FR-siwis-medium` (base SIWIS, licence **CC BY 4.0**).
 - **Police Andika** : © SIL International, licence **SIL Open Font License 1.1** (voir `polices/OFL.txt`).
 - Dessins, sons et code : créés pour ce jeu.

@@ -17,7 +17,9 @@ const PHONEME = { a: 'a', i: 'i', o: 'o', u: 'y', é: 'e', e: 'ə', m: 'm', l: '
   v: 'v', n: 'n', p: 'p', t: 't', d: 'd', b: 'b' };
 const VOYELLES_SET = new Set(['a', 'i', 'o', 'u', 'é', 'e']);
 const sonLettre = (l) => (VOYELLES_SET.has(l) ? `ˈ${PHONEME[l]}` : `ˈ${PHONEME[l]}ə`);
-const LECTURE_TABLETTE = { m: 'meu', l: 'leu', r: 'reu', s: 'seu', f: 'feu', v: 'veu', n: 'neu', p: 'peu', t: 'teu',
+/* Version « écrite » des sons, utilisée par la voix Hélène (Inworld) et la voix de la tablette :
+   choisie à l'oreille le 26/11/2026 (bien meilleure que les phonèmes). */
+const LECTURE_TABLETTE = { m: 'mmmm', l: 'llll', r: 'rrrr', s: 'ssss', f: 'ffff', v: 'vvvv', n: 'nnnn', p: 'peu', t: 'teu',
   d: 'deu', b: 'beu', a: 'a', i: 'i', o: 'o', u: 'u', é: 'é', e: 'eu' };
 
 /* Mots que la voix lisait mal : on lui donne la bonne prononciation. */
@@ -33,7 +35,7 @@ for (const c of CONSONNES) {
   for (const v of VOYELLES) {
     const s = c + v;
     // Toujours en phonèmes : sinon la voix lit parfois le nom des lettres (« bé » → « bi »)
-    r[idSyllabe(s)] = `[[ ˈ${PHONEME[c]}${PHONEME[v]} ]]|${s}`;
+    r[idSyllabe(s)] = `[[ ˈ${PHONEME[c]}${PHONEME[v]} ]]|${v === 'e' ? c + 'eu' : s}`;
   }
 }
 

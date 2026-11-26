@@ -124,7 +124,7 @@ function afficherPanneau() {
         <label>Volume <input type="range" min="0" max="1" step="0.05" value="${r.volume}" class="volume"></label>
         <label>Voix de Lilo
           <select class="voix">
-            <option value="">Lilo — voix Siwis (recommandée, hors-ligne)</option>
+            <option value="">Lilo — voix Hélène (recommandée, hors-ligne)</option>
             ${voixTablette.map((v) => `<option value="${v.name}" ${r.voix === v.name ? 'selected' : ''}>Tablette — ${v.name}</option>`).join('')}
           </select>
         </label>
@@ -153,7 +153,7 @@ function afficherPanneau() {
 
       <section>
         <h3>Crédits</h3>
-        <p class="aide">Voix de Lilo : Piper, voix « Siwis » (base SIWIS, licence CC BY 4.0).
+        <p class="aide">Voix de Lilo : « Hélène » (Inworld).
           Police Andika : SIL International (licence OFL). Dessins, sons et code créés pour ce jeu.</p>
       </section>
     </div>`;

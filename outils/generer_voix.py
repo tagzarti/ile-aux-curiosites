@@ -14,6 +14,7 @@ Seules les phrases nouvelles ou modifiées sont regénérées.
 À lancer avec : ./outils/generer-voix.sh
 """
 
+import base64
 import hashlib
 import json
 import re
@@ -56,6 +57,29 @@ def lire_config_azure():
 
 
 AZURE = lire_config_azure()
+CONFIG_INWORLD = OUTILS / "inworld.env"
+
+
+def lire_config_inworld():
+    """Lit outils/inworld.env (clé, voix, modèle, vitesse). None si pas de clé."""
+    if not CONFIG_INWORLD.exists():
+        return None
+    conf = {}
+    for ligne in CONFIG_INWORLD.read_text(encoding="utf-8").splitlines():
+        if "=" in ligne and not ligne.strip().startswith("#"):
+            k, v = ligne.split("=", 1)
+            conf[k.strip()] = v.strip()
+    if not conf.get("INWORLD_CLE"):
+        return None
+    conf["INWORLD_VOIX"] = conf.get("INWORLD_VOIX") or "Hélène"
+    conf["INWORLD_MODELE"] = conf.get("INWORLD_MODELE") or "inworld-tts-2"
+    conf["INWORLD_VITESSE"] = conf.get("INWORLD_VITESSE") or "0.9"
+    return conf
+
+
+INWORLD = lire_config_inworld()
+if INWORLD:
+    AZURE = None  # Inworld passe en premier quand les deux sont configurés
 
 
 def lire_repliques():
@@ -73,6 +97,8 @@ def preparer_texte(texte):
 
 
 def moteur():
+    if INWORLD:
+        return f"inworld|{INWORLD['INWORLD_VOIX']}|{INWORLD['INWORLD_MODELE']}|{INWORLD['INWORLD_VITESSE']}"
     if AZURE:
         return f"azure|{AZURE['AZURE_VOIX']}|{AZURE['AZURE_VITESSE']}"
     return f"piper|siwis|{LENTEUR}"
@@ -123,10 +149,39 @@ def appeler_azure(document, wav):
     sys.exit("Azure ne répond pas, réessaie plus tard.")
 
 
+def appeler_inworld(texte, wav):
+    """Inworld : la réplique en texte simple (pour les sons de lecture : la version après « | »)."""
+    a_dire = texte.split("|")[1] if "|" in texte else texte
+    corps = {"text": a_dire, "voiceId": INWORLD["INWORLD_VOIX"], "modelId": INWORLD["INWORLD_MODELE"],
+             "language": "fr-FR",
+             "audioConfig": {"audioEncoding": "LINEAR16", "sampleRateHertz": 24000,
+                             "speakingRate": float(INWORLD["INWORLD_VITESSE"])}}
+    for essai in range(8):
+        req = urllib.request.Request("https://api.inworld.ai/tts/v1/voice", data=json.dumps(corps).encode("utf-8"),
+                                     method="POST", headers={"Authorization": "Basic " + INWORLD["INWORLD_CLE"],
+                                                             "Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=60) as rep:
+                Path(wav).write_bytes(base64.b64decode(json.load(rep)["audioContent"]))
+                return
+        except urllib.error.HTTPError as err:
+            if err.code == 429 or err.code >= 500:
+                time.sleep(5 * (essai + 1))
+                continue
+            if err.code in (401, 403):
+                sys.exit("Inworld refuse la clé : vérifie INWORLD_CLE dans outils/inworld.env.")
+            raise
+        except urllib.error.URLError:
+            time.sleep(5 * (essai + 1))
+    sys.exit("Inworld ne répond pas, réessaie plus tard.")
+
+
 def generer(texte, sortie):
     with tempfile.TemporaryDirectory() as tmp:
         wav = Path(tmp) / "phrase.wav"
-        if AZURE:
+        if INWORLD:
+            appeler_inworld(texte, wav)
+        elif AZURE:
             appeler_azure(ssml(texte), wav)
         else:
             subprocess.run(
@@ -141,9 +196,11 @@ def generer(texte, sortie):
 
 
 def main():
-    if not AZURE and (not PIPER.exists() or not MODELE.exists()):
+    if not INWORLD and not AZURE and (not PIPER.exists() or not MODELE.exists()):
         sys.exit("Piper ou la voix Siwis est introuvable dans outils/. Voir le README.")
-    print(f"Voix utilisée : {'Azure — ' + AZURE['AZURE_VOIX'] if AZURE else 'Siwis (Piper)'}")
+    nom = (f"Inworld — {INWORLD['INWORLD_VOIX']}" if INWORLD
+           else f"Azure — {AZURE['AZURE_VOIX']}" if AZURE else "Siwis (Piper)")
+    print(f"Voix utilisée : {nom}")
 
     DOSSIER_LILO.mkdir(parents=True, exist_ok=True)
     ancien = json.loads(INDEX.read_text()) if INDEX.exists() else {}
